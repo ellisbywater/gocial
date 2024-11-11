@@ -86,7 +86,7 @@ var comments = []string{
 func Seed(store store.Storage) {
 	fmt.Println("Seeding has started...")
 	ctx := context.Background()
-
+	fmt.Println("...Generating users")
 	users := generateUsers(100)
 	for _, user := range users {
 		if err := store.Users.Create(ctx, user); err != nil {
@@ -94,7 +94,7 @@ func Seed(store store.Storage) {
 			return
 		}
 	}
-
+	fmt.Println("...Generating Posts")
 	posts := generatePosts(200, users)
 	for _, post := range posts {
 		if err := store.Posts.Create(ctx, post); err != nil {
@@ -102,7 +102,7 @@ func Seed(store store.Storage) {
 			return
 		}
 	}
-
+	fmt.Println("...Generating Comments")
 	comments := generateComments(500, users, posts)
 	for _, comment := range comments {
 		if err := store.Comments.Create(ctx, comment); err != nil {

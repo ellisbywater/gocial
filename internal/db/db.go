@@ -3,10 +3,12 @@ package db
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 )
 
 func New(addr string, maxOpenConns int, maxIdleConns int, maxIdleTime string) (*sql.DB, error) {
+	fmt.Println("Connecting to DB at: ", addr)
 	db, err := sql.Open("postgres", addr)
 	if err != nil {
 		return nil, err

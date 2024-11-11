@@ -31,7 +31,7 @@ func (s *PostStore) Create(ctx context.Context, post *Post) error {
 	`
 	ctx, cancel := context.WithTimeout(ctx, QueryCtxTimeout)
 	defer cancel()
-	err := s.db.QueryRowContext(ctx, query, post.Content, post.Title, post, post.UserID, pq.Array(post.Tags)).Scan(
+	err := s.db.QueryRowContext(ctx, query, post.Content, post.Title, post.UserID, pq.Array(post.Tags)).Scan(
 		&post.ID,
 		&post.CreatedAt,
 		&post.UpdatedAt,
