@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ellisbywater/gocial/internal/mailer"
 	"github.com/ellisbywater/gocial/internal/store"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -17,18 +18,27 @@ type application struct {
 	config config
 	store  store.Storage
 	logger *zap.SugaredLogger
+	mailer mailer.Client
 }
 
 type config struct {
-	addr   string
-	db     dbConfig
-	env    string
-	apiUrl string
-	mail   mailConfig
+	addr        string
+	db          dbConfig
+	env         string
+	apiUrl      string
+	mailer      mailConfig
+	frontendURL string
 }
 
 type mailConfig struct {
-	exp time.Duration
+	sendgrid  sendgridConfig
+	fromEmail string
+	exp       time.Duration
+}
+
+type sendgridConfig struct {
+	apiKey    string
+	fromEmail string
 }
 type dbConfig struct {
 	addr         string
