@@ -63,5 +63,5 @@ func (m *SendgridMailer) Send(templateFile, username, email string, data any, is
 		}
 		return response.StatusCode, nil
 	}
-	return -1, fmt.Errorf("failed to send email after %d attempts, error: %v", maxRetries, retryError.Error())
+	return -1, fmt.Errorf("failed to send email after %d attempts, error: %v", maxRetries, retryError)
 }
