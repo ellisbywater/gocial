@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/ellisbywater/gocial/internal/auth"
 	"github.com/ellisbywater/gocial/internal/db"
 	"github.com/ellisbywater/gocial/internal/env"
 	"github.com/ellisbywater/gocial/internal/mailer"
@@ -38,6 +39,11 @@ func main() {
 				username: env.GetString("AUTH_BASIC_USERNAME", "admin"),
 				pass:     env.GetString("AUTH_BASIC_PASS", "admin"),
 			},
+			token: tokenConfig{
+				secret: env.GetString("AUTH_TOKEN_SECRET", ""),
+				exp:    time.Hour * 48,
+				iss:    "gocial",
+			},
 		},
 	}
 
@@ -61,11 +67,15 @@ func main() {
 	store := store.NewStorage(db)
 
 	mailer := mailer.NewSendgrid(cfg.mailer.sendgrid.apiKey, cfg.mailer.fromEmail)
+
+	jwtAuthenticator := auth.NewJWTAuthenticator(cfg.auth.token.secret, "gocial", "gocial")
+
 	app := &application{
-		config: cfg,
-		store:  store,
-		logger: logger,
-		mailer: mailer,
+		config:        cfg,
+		store:         store,
+		logger:        logger,
+		mailer:        mailer,
+		authenticator: jwtAuthenticator,
 	}
 
 	mux := app.mount()

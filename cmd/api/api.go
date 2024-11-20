@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ellisbywater/gocial/internal/auth"
 	"github.com/ellisbywater/gocial/internal/mailer"
 	"github.com/ellisbywater/gocial/internal/store"
 	"github.com/go-chi/chi/v5"
@@ -16,10 +17,11 @@ import (
 )
 
 type application struct {
-	config config
-	store  store.Storage
-	logger *zap.SugaredLogger
-	mailer mailer.Client
+	config        config
+	store         store.Storage
+	logger        *zap.SugaredLogger
+	mailer        mailer.Client
+	authenticator auth.Authenticator
 }
 
 type config struct {
@@ -34,6 +36,13 @@ type config struct {
 
 type authConfig struct {
 	basic authBasicConfig
+	token tokenConfig
+}
+
+type tokenConfig struct {
+	secret string
+	exp    time.Duration
+	iss    string
 }
 
 type authBasicConfig struct {
@@ -115,6 +124,7 @@ func (app *application) mount() http.Handler {
 		// public routes
 		r.Route("/authentication", func(r chi.Router) {
 			r.Post("/user", app.registerUserHandler)
+			r.Post("/token", app.createUserTokenHandler)
 		})
 	})
 	// posts
