@@ -57,15 +57,14 @@ type FollowUser struct {
 func (app *application) followUserHandler(w http.ResponseWriter, r *http.Request) {
 	//
 	follower := getUserFromContext(r)
-
-	// revert at auth implementation
-	var payload FollowUser
-	if err := readJSON(w, r, &payload); err != nil {
+	followedID, err := strconv.ParseInt(chi.URLParam(r, "userID"), 10, 64)
+	if err != nil {
 		app.badRequestError(w, r, err)
 		return
 	}
+
 	ctx := r.Context()
-	if err := app.store.Followers.Follow(ctx, follower.ID, payload.UserID); err != nil {
+	if err := app.store.Followers.Follow(ctx, follower.ID, followedID); err != nil {
 		switch err {
 		case store.ErrConflict:
 			app.conflictingResourceError(w, r, err)
@@ -97,14 +96,13 @@ func (app *application) followUserHandler(w http.ResponseWriter, r *http.Request
 func (app *application) unfollowUserHandler(w http.ResponseWriter, r *http.Request) {
 	follower := getUserFromContext(r)
 
-	//TODO: revert at auth implementation
-	var payload FollowUser
-	if err := readJSON(w, r, &payload); err != nil {
+	unfollowedID, err := strconv.ParseInt(chi.URLParam(r, "userID"), 10, 64)
+	if err != nil {
 		app.badRequestError(w, r, err)
 		return
 	}
 	ctx := r.Context()
-	if err := app.store.Followers.Unfollow(ctx, follower.ID, payload.UserID); err != nil {
+	if err := app.store.Followers.Unfollow(ctx, follower.ID, unfollowedID); err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
